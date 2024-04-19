@@ -96,3 +96,5 @@ You can uncomment those two lines in `phpunit.xml` to run the test on an sqlite 
     }
 ]
 ```
+
+`\api\login` requires `email` and `password`. `\api\register` requires `name`, `password`, `email`, `password` and `password_confirmation`.
