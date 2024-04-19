@@ -21,8 +21,7 @@ class RedirectIfAuthenticated
 
     foreach ($guards as $guard) {
       if (Auth::guard($guard)->check()) {
-        // return redirect(RouteServiceProvider::HOME);
-        return response()->json(['message' => 'Can not visit this route. You are already logged in.']);
+        return redirect('/api/user');
       }
     }
 

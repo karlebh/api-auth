@@ -55,7 +55,7 @@ class UserFactory extends Factory
     ]);
   }
 
-  public function normalUser(): static
+  public function regularUser(): static
   {
     return $this->state(fn (array $attributes) => [
       'role' => 'user'

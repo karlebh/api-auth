@@ -13,9 +13,9 @@ class UserControllerTest extends TestCase
 
   use RefreshDatabase;
 
-  public function test_guest_can_not_create_other_users()
+  public function test_guest_can_not_create_other_users(): void
   {
-    $response =  $this->postJson('/api/user', [
+    $this->postJson('/api/user', [
       'name' => 'User 1',
       'email' => 'user1@example.com',
       'password' => 'user_one_20204',
@@ -25,7 +25,7 @@ class UserControllerTest extends TestCase
     $this->assertCount(0, User::all());
   }
 
-  public function test_user_can_create_other_users()
+  public function test_user_can_create_other_users(): void
   {
     $user = User::factory()->create();
 
@@ -44,33 +44,24 @@ class UserControllerTest extends TestCase
     $this->assertCount(2, User::all());
   }
 
-  public function test_an_existing_user_can_be_edited_by_user()
+  public function test_an_existing_user_can_be_edited_by_user(): void
   {
-    $user = User::factory()->create();
+    $user1 = User::factory()->create();
+    $user2 = User::factory()->create();
 
-    Passport::actingAs(
-      $user
-    );
+    Passport::actingAs($user1);
 
-    $this->postJson('/api/user', [
-      'name' => 'User 1',
-      'email' => 'user1@example.com',
-      'password' => 'user_one_20204',
-      'password_confirmation' => 'user_one_20204'
+    $response = $this->putJson('/api/user/' . $user2->id, [
+      'name' => 'Updated Name',
     ]);
 
-    $newUser = User::first();
-
-    $response = $this->putJson("/api/user/$newUser", [
-      'name' => 'User 1 new name',
+    $response->assertStatus(200);
+    $this->assertDatabaseHas('users', [
+      'id' => $user2->id,
+      'name' => 'Updated Name',
     ]);
-
-    $this->assertEquals('User 1 new name', User::first()->name);
-    $response->assertOk();
-    $response->assertSessionHasNoErrors();
   }
-
-  public function test_guest_can_not_delete_user()
+  public function test_guest_can_not_delete_user(): void
   {
     $response = $this->deleteJson('/api/user/1');
 
@@ -78,9 +69,9 @@ class UserControllerTest extends TestCase
   }
 
 
-  public function test_regular_user_can_not_delete_user()
+  public function test_regular_user_can_not_delete_user(): void
   {
-    $user = User::factory()->normalUser()->create();
+    $user = User::factory()->regularUser()->create();
 
     Passport::actingAs(
       $user
@@ -99,28 +90,20 @@ class UserControllerTest extends TestCase
     $this->assertCount(2, User::all());
   }
 
-  public function test_only_admin_can_delete_a_user()
+  public function test_only_admin_can_delete_a_user(): void
   {
+    $user2 = User::factory()->regularUser()->create();
     $user = User::factory()->admin()->create();
 
     Passport::actingAs(
       $user
     );
 
-    $this->postJson('/api/user', [
-      'name' => 'User 1',
-      'email' => 'user1@example.com',
-      'password' => 'user_one_20204',
-      'password_confirmation' => 'user_one_20204'
-    ]);
-
     $this->assertCount(2, User::all());
 
-    $userLatest = User::first();
+    $response = $this->deleteJson("/api/user/" . $user2->id);
 
-    $response = $this->deleteJson("/api/user/" . $userLatest);
-
-    // $response->assertOk();
+    $response->assertOk();
     $this->assertCount(1, User::all());
     $this->assertEquals('admin', $user->role);
   }

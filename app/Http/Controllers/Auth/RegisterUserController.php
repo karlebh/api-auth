@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
 
 class RegisterUserController extends Controller
 {
@@ -21,8 +20,6 @@ class RegisterUserController extends Controller
     ]);
 
     $token = $user->createToken('Secured Token')->accessToken;
-
-    Auth::login($user);
 
     return response()->json(['token' => $token]);
   }

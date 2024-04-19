@@ -11,9 +11,9 @@ class RegisterControllerTest extends TestCase
 {
   use RefreshDatabase;
 
-  public function test_user_can_be_created()
+  public function test_user_can_be_created(): void
   {
-    $response = $this->postJson('/api/register', [
+    $this->postJson('/api/register', [
       'name' => 'User 1',
       'email' => 'user1@example.com',
       'password' => 'user_one_20204',
@@ -21,10 +21,10 @@ class RegisterControllerTest extends TestCase
     ]);
 
     $this->assertCount(1, User::all());
-    // $response->assertOK();
+    $this->assertEquals('User 1', User::first()->name);
   }
 
-  public function test_only_unique_name_is_allowed()
+  public function test_only_unique_name_is_allowed(): void
   {
     $this->postJson('/api/register', [
       'name' => 'User 1',
@@ -44,7 +44,7 @@ class RegisterControllerTest extends TestCase
     $this->assertCount(1, User::all());
   }
 
-  public function test_only_unique_email_is_allowed()
+  public function test_only_unique_email_is_allowed(): void
   {
     $this->postJson('/api/register', [
       'name' => 'User 1',
@@ -64,7 +64,7 @@ class RegisterControllerTest extends TestCase
     $this->assertCount(1, User::all());
   }
 
-  public function test_users_with_unique_email_and_name_have_no_problem_creating_accounts()
+  public function test_users_with_unique_email_and_name_have_no_problem_creating_accounts(): void
   {
     $this->postJson('/api/register', [
       'name' => 'User 1',
@@ -84,7 +84,7 @@ class RegisterControllerTest extends TestCase
     $this->assertCount(2, User::all());
   }
 
-  public function test_only_valid_email_allowed()
+  public function test_only_valid_email_allowed(): void
   {
     $response = $this->postJson('/api/register', [
       'name' => 'User 1',
@@ -97,7 +97,7 @@ class RegisterControllerTest extends TestCase
     $this->assertCount(0, User::all());
   }
 
-  public function test_all_fileds_are_required()
+  public function test_all_fileds_are_required(): void
   {
     $response = $this->postJson('/api/register', [
       'name' => '',
@@ -110,7 +110,7 @@ class RegisterControllerTest extends TestCase
     $this->assertCount(0, User::all());
   }
 
-  public function test_password_has_to_match_password_confirmation_column()
+  public function test_password_has_to_match_password_confirmation_column(): void
   {
     $response = $this->postJson('/api/register', [
       'name' => 'User 1',
