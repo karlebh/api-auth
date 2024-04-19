@@ -11,4 +11,4 @@
 
 -   Test Runing
 
-1.  Run ** php artisan test ** to run the test.
+1. Run `php artisan test` to run the test.
