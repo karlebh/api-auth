@@ -29,10 +29,12 @@ class PrepareApplication extends Command
   {
     $this->info('Preparing APIs...');
 
-    $this->call('migrate:fresh');
+    $this->call('migrate');
 
     $this->call('db:seed');
 
     $this->call('passport:install', ['--force' => true]);
+
+    $this->call('serve');
   }
 }
