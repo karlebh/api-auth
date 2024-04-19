@@ -31,7 +31,7 @@ class UserController extends Controller
 
     $user = User::create($data);
 
-    return response()->json([$data]);
+    return response()->json(['message' => 'User created successfully']);
   }
 
   /**
@@ -57,7 +57,7 @@ class UserController extends Controller
    */
   public function destroy(User $user): JsonResponse
   {
-    abort_if(auth()->user()->role !== 'admin', 403, 'Unathorized');
+    abort_if(auth()->user()->role !== 'admin', 403, 'Unathorized: only admin can delete users');
 
     $user->delete();
 

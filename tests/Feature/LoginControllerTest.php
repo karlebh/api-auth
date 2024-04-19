@@ -18,34 +18,66 @@ class LoginControllerTest extends TestCase
   {
     $user = User::factory()->create();
 
-    $this->postJson('/api/register', [
-      'name' => 'User 1',
-      'email' => 'user1@example.com',
-      'password' => 'user_one_20204',
-      'password_confirmation' => 'user_one_20204'
+    $response = $this->postJson('/api/login', [
+      'email' => $user->email,
+      'password' => $user->password,
     ]);
+
+    $response->assertOk();
+    $response->assertSessionDoesntHaveErrors();
+  }
+
+  public function test_email_input_data_is_needed_for_log_in()
+  {
+    $user = User::factory()->create();
+
+    $response = $this->postJson('/api/login', [
+      'email' => '',
+      'password' => $user->password,
+    ]);
+
+    $response->assertInvalid(['email']);
+  }
+
+  public function test_password_input_data_is_needed_for_log_in()
+  {
+    $user = User::factory()->create();
+
+    $response = $this->postJson('/api/login', [
+      'email' => $user->email,
+      'password' => '',
+    ]);
+
+    $response->assertInvalid(['password']);
+  }
+
+  public function test_already_logged_in_user_can_not_login_again()
+  {
+    $user = User::factory()->create();
+
+    Passport::actingAs($user);
+
+    $response = $this->postJson('/api/login', [
+      'email' => $user->email,
+      'password' => '',
+    ]);
+
+    // $response->assertStatus(400); 
+    $response->assertJson([
+      'message' => 'Can not visit this route. You are already logged in.', // or your custom message
+    ]);
+  }
+
+  public function test_logged_in_user_can_log_out()
+  {
+    $user = User::factory()->create();
 
     Passport::actingAs(
       $user
     );
 
-    $response = $this->postJson('/api/login', [
-      'email' => 'user1@example.com',
-      'password' => 'user_one_20204',
-    ]);
+    $this->postJson('/api/logout');
 
-    $response->assertOk();
-  }
-
-  public function test_proper_input_data_is_needed_for_log_in()
-  {
-  }
-
-  public function test_already_logged_in_user_can_not_login_again()
-  {
-  }
-
-  public function test_logged_in_user_can_log_out()
-  {
+    $this->assertFalse($user->token()->exists());
   }
 }

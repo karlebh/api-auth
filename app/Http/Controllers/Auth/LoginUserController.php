@@ -13,25 +13,17 @@ class LoginUserController extends Controller
   public function store(LoginUserRequest $request): JsonResponse
   {
     if (!Auth::attempt(($request->validated()))) {
-      return ['message' => 'Incorrect data. Try again'];
+      return response()->json(['message' => 'Incorrect data. Try again']);
     }
-
-    $request->session()->regenerate();
 
     $token  = $request->user()->createToken('Random Token')->accessToken;
 
     return response()->json(['token' => $token]);
   }
 
-  public function destroy(Request $request): JsonResponse
+  public function destroy(): JsonResponse
   {
     auth()->user()->token()->revoke();
-
-    Auth::logout();
-
-    $request->session()->invalidate();
-
-    $request->session()->regenerateToken();
 
     return response()->json(['message' => 'User Logged Out']);
   }

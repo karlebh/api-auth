@@ -20,7 +20,7 @@ class RegisterUserController extends Controller
       'password' => Hash::make($request->password),
     ]);
 
-    $token = $user->createToken('Random Token')->accessToken;
+    $token = $user->createToken('Secured Token')->accessToken;
 
     Auth::login($user);
 

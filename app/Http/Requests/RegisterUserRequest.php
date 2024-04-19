@@ -35,8 +35,6 @@ class RegisterUserRequest extends FormRequest
             ->numbers()
             ->symbols()
         ],
-
-
       ];
   }
 }

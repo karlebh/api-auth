@@ -44,31 +44,31 @@ class UserControllerTest extends TestCase
     $this->assertCount(2, User::all());
   }
 
-  // public function test_an_existing_user_can_be_edited_by_user()
-  // {
-  //   $user = User::factory()->create();
+  public function test_an_existing_user_can_be_edited_by_user()
+  {
+    $user = User::factory()->create();
 
-  //   Passport::actingAs(
-  //     $user
-  //   );
+    Passport::actingAs(
+      $user
+    );
 
-  //   $this->postJson('/api/user', [
-  //     'name' => 'User 1',
-  //     'email' => 'user1@example.com',
-  //     'password' => 'user_one_20204',
-  //     'password_confirmation' => 'user_one_20204'
-  //   ]);
+    $this->postJson('/api/user', [
+      'name' => 'User 1',
+      'email' => 'user1@example.com',
+      'password' => 'user_one_20204',
+      'password_confirmation' => 'user_one_20204'
+    ]);
 
-  //   $newUser = User::first();
+    $newUser = User::first();
 
-  //   $response = $this->putJson("/api/user/2", [
-  //     'name' => 'User 1 new name',
-  //   ]);
+    $response = $this->putJson("/api/user/$newUser", [
+      'name' => 'User 1 new name',
+    ]);
 
-  //   $this->assertCount(3, User::all());
-  //   $response->assertOk();
-  //   $response->assertSessionHasNoErrors();
-  // }
+    $this->assertEquals('User 1 new name', User::first()->name);
+    $response->assertOk();
+    $response->assertSessionHasNoErrors();
+  }
 
   public function test_guest_can_not_delete_user()
   {
@@ -114,10 +114,14 @@ class UserControllerTest extends TestCase
       'password_confirmation' => 'user_one_20204'
     ]);
 
-    $response = $this->deleteJson('/api/user/1');
+    $this->assertCount(2, User::all());
 
+    $userLatest = User::first();
+
+    $response = $this->deleteJson("/api/user/" . $userLatest);
 
     // $response->assertOk();
     $this->assertCount(1, User::all());
+    $this->assertEquals('admin', $user->role);
   }
 }
