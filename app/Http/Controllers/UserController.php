@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 class UserController extends Controller
 {
@@ -22,14 +23,21 @@ class UserController extends Controller
   /**
    * Store a newly created resource in storage.
    */
-  public function store(StoreUserRequest $request): JsonResponse
+  public function store(Request $request): JsonResponse
   {
+    $all = $request->validate([
+      'name' => ['required', 'string', 'min:4', 'max:20', 'unique:' . User::class],
+      'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
+      'password' => ['required', 'confirmed', Rules\Password::defaults()],
+    ]);
+
     $data = array_merge(
-      $request->validated(),
+      $all,
       ['password' => Hash::make($request->password)]
     );
 
     $user = User::create($data);
+
 
     return response()->json(['message' => 'User created successfully']);
   }
